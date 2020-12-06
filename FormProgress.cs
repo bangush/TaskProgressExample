@@ -10,7 +10,8 @@ namespace TaskProgressExample
     {
         private Label LabelInfo1;
         private Label LabelInfo2;
-        private ProgressBar ProgressBar;
+
+        public ProgressBar ProgressBar;
 
         public Progress<string> Progress;
         public CancellationTokenSource CancellationTokenSource;
@@ -78,15 +79,6 @@ namespace TaskProgressExample
                 ProgressBar.Value = int.Parse(segs[0]);
                 LabelInfo2.Text = segs[0] + ": " + segs[1];
             });
-        }
-
-        public async Task<long> RunTask(Func<long> action)
-        {
-            var result = await Task<long>.Run(action);
-
-            this.Close();
-
-            return result;
         }
     }
 }

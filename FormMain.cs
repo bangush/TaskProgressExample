@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TaskProgressExample
@@ -62,40 +63,42 @@ namespace TaskProgressExample
         private async void ButtonExample1_Click(object sender, EventArgs e)
         {
             int n = 50;
-            long result;
-            using (var formProgress = new FormProgress("Example 1", "No progress report, please wait for 5 seconds.", 0, false))
-            {
-                formProgress.Show();
-                result = await formProgress.RunTask(() => Fibonacci(n, null, null));
-            }
+            var result = await RunTask("Example 1", "No progress report, please wait for 5 seconds.", n, 0, false);
             MessageBox.Show("The " + n + "th Fibonacci number is " + result, "Finished!");
         }
 
         private async void ButtonExample2_Click(object sender, EventArgs e)
         {
             int n = 50;
-            long result;
-            using (var formProgress = new FormProgress("Example 2", "", n, false))
-            {
-                formProgress.Show();
-                result = await formProgress.RunTask(() => Fibonacci(n, formProgress.Progress, null));
-            }
+            var result = await RunTask("Example 2", "", n, n, false);
             MessageBox.Show("The " + n + "th Fibonacci number is " + result, "Finished!");
         }
 
         private async void ButtonExample3_Click(object sender, EventArgs e)
         {
             int n = 50;
-            long result;
-            using (var formProgress = new FormProgress("Example 3", "", n, true))
-            {
-                formProgress.Show();
-                result = await formProgress.RunTask(() => Fibonacci(n, formProgress.Progress, formProgress.CancellationTokenSource));
-            }
+            var result = await RunTask("Example 3", "", n, n, true);
             if(result > 0)
                 MessageBox.Show("The " + n + "th Fibonacci number is " + result, "Finished!");
             else
                 MessageBox.Show("The calculation has been cancelled.", "Cancelled!");
+        }
+
+        public async Task<long> RunTask(string info1, string info2, int n, int maxProgress, bool isCancellable)
+        {
+            long result;
+            using (var formProgress = new FormProgress(info1, info2, maxProgress, isCancellable))
+            {
+                formProgress.Show();
+
+                result = await Task.Run(() => Fibonacci(n,
+                     maxProgress > 0 ? formProgress.Progress : null,
+                     isCancellable ? formProgress.CancellationTokenSource : null));
+
+                formProgress.Close();
+            }
+
+            return result;
         }
 
         public static long Fibonacci(int len, IProgress<string> progress, CancellationTokenSource cancellationTokenSource)
