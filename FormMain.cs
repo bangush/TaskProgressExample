@@ -69,71 +69,34 @@ namespace TaskProgressExample
         {
             int n = 50;
             long result;
-            using (var formProgress = new FormProgress(this, "Example 1", "No progress report, please wait for 5 seconds.", false, false))
+            using (var formProgress = new FormProgress(this, "Example 1", "No progress report, please wait for 5 seconds.", 0, false))
             {
                 formProgress.Show();
-                result = await formProgress.RunTask(() => Fibonacci(n));
+                result = await formProgress.RunTask(() => Fibonacci(n, null, null));
             }
             MessageBox.Show("The " + n + "th Fibonacci number is " + result, "Finished!");
-        }
-
-        public static long Fibonacci(int len)
-        {
-            long a = 0, b = 1, c = 0;
-            for (int i = 2; i < len; i++)
-            {
-                // For demonstration only
-                Thread.Sleep(100);
-
-                c = a + b;
-                a = b;
-                b = c;
-            }
-
-            return c;
         }
 
         private async void ButtonExample2_Click(object sender, EventArgs e)
         {
             int n = 50;
             long result;
-            using (var formProgress = new FormProgress(this, "Example 2", "", true, false))
+            using (var formProgress = new FormProgress(this, "Example 2", "", n, false))
             {
-                formProgress.ProgressBar.Maximum = n;
                 formProgress.Show();
-                result = await formProgress.RunTask(() => Fibonacci(n, formProgress.Progress));
+                result = await formProgress.RunTask(() => Fibonacci(n, formProgress.Progress, null));
             }
             MessageBox.Show("The " + n + "th Fibonacci number is " + result, "Finished!");
-        }
-
-        public static long Fibonacci(int len, IProgress<string> progress)
-        {
-            long a = 0, b = 1, c = 0;
-            for (int i = 2; i < len; i++)
-            {
-                // For demonstration only
-                Thread.Sleep(100);
-
-                c = a + b;
-                a = b;
-                b = c;
-
-                if (progress != null)
-                    progress.Report(i.ToString() + "|" + c.ToString());
-            }
-
-            return c;
         }
 
         private async void ButtonExample3_Click(object sender, EventArgs e)
         {
             int n = 50;
             long result;
-            using (var formProgress = new FormProgress(this, "Example 3", "", true, true))
+            using (var formProgress = new FormProgress(this, "Example 3", "", n, true))
             {
-                formProgress.ProgressBar.Maximum = n;
                 formProgress.Show();
-                result = await formProgress.RunTask(() => Fibonacci(n, formProgress.Progress, formProgress.CancellationTokenSource.Token));
+                result = await formProgress.RunTask(() => Fibonacci(n, formProgress.Progress, formProgress.CancellationTokenSource));
             }
             if(result > 0)
                 MessageBox.Show("The " + n + "th Fibonacci number is " + result, "Finished!");
@@ -141,12 +104,12 @@ namespace TaskProgressExample
                 MessageBox.Show("The calculation has been cancelled.", "Cancelled!");
         }
 
-        public static long Fibonacci(int len, IProgress<string> progress, CancellationToken token)
+        public static long Fibonacci(int len, IProgress<string> progress, CancellationTokenSource cancellationTokenSource)
         {
             long a = 0, b = 1, c = 0;
             for (int i = 2; i < len; i++)
             {
-                if (token.IsCancellationRequested)
+                if (cancellationTokenSource != null && cancellationTokenSource.Token.IsCancellationRequested)
                     return 0;
 
                 // For demonstration only

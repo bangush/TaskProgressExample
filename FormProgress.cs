@@ -8,21 +8,18 @@ namespace TaskProgressExample
 {
     public partial class FormProgress : Form
     {
-        public Label LabelInfo1;
-        public Label LabelInfo2;
-
-        public ProgressBar ProgressBar;
-
-        public Progress<string> Progress;
-
-        public CancellationTokenSource CancellationTokenSource;
-
+        private Label LabelInfo1;
+        private Label LabelInfo2;
+        private ProgressBar ProgressBar;
         private Form parentForm;
 
-        private bool updateProgress;
+        private int maxProgress;
         private bool isCancellable;
 
-        public FormProgress(Form parentForm, string info1, string info2, bool updateProgress, bool isCancellable)
+        public Progress<string> Progress;
+        public CancellationTokenSource CancellationTokenSource;
+
+        public FormProgress(Form parentForm, string info1, string info2, int maxProgress, bool isCancellable)
         {
             InitializeComponent();
 
@@ -35,7 +32,7 @@ namespace TaskProgressExample
             this.Shown += FormProgress_Shown;
 
             this.parentForm = parentForm;
-            this.updateProgress = updateProgress;
+            this.maxProgress = maxProgress;
             this.isCancellable = isCancellable;
 
             CancellationTokenSource = new CancellationTokenSource();
@@ -69,7 +66,8 @@ namespace TaskProgressExample
             ProgressBar = new ProgressBar
             {
                 Dock = DockStyle.Fill,
-                Style = updateProgress ? ProgressBarStyle.Blocks : ProgressBarStyle.Marquee,
+                Maximum = maxProgress,
+                Style = maxProgress > 0 ? ProgressBarStyle.Blocks : ProgressBarStyle.Marquee,
             };
             tableLayout.Controls.Add(ProgressBar);
 
@@ -101,7 +99,7 @@ namespace TaskProgressExample
 
         public async Task<long> RunTask(Func<long> action)
         {
-            if (updateProgress)
+            if (maxProgress > 0)
             {
                 Progress = new Progress<string>(info =>
                 {
