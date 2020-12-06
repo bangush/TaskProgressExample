@@ -14,7 +14,6 @@ namespace TaskProgressExample
         private Form parentForm;
 
         private int maxProgress;
-        private bool isCancellable;
 
         public Progress<string> Progress;
         public CancellationTokenSource CancellationTokenSource;
@@ -33,7 +32,6 @@ namespace TaskProgressExample
 
             this.parentForm = parentForm;
             this.maxProgress = maxProgress;
-            this.isCancellable = isCancellable;
 
             CancellationTokenSource = new CancellationTokenSource();
 
