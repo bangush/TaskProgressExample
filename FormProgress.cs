@@ -66,7 +66,7 @@ namespace TaskProgressExample
             ProgressBar = new ProgressBar
             {
                 Dock = DockStyle.Fill,
-                Maximum = maxProgress,
+                Maximum = maxProgress > 0 ? maxProgress : 100,
                 Style = maxProgress > 0 ? ProgressBarStyle.Blocks : ProgressBarStyle.Marquee,
             };
             tableLayout.Controls.Add(ProgressBar);
@@ -75,20 +75,11 @@ namespace TaskProgressExample
             var ButtonCancel = new Button
             {
                 Anchor = AnchorStyles.None,
+                Text = isCancellable ? "Cancel" : "Please wait",
+                Enabled = isCancellable
             };
             ButtonCancel.Click += (s, e) => { CancellationTokenSource.Cancel(); };
             tableLayout.Controls.Add(ButtonCancel);
-            this.CancelButton = ButtonCancel;
-            if (isCancellable)
-            {
-                ButtonCancel.Text = "Cancel";
-                ButtonCancel.Enabled = true;
-            }
-            else
-            {
-                ButtonCancel.Text = "Please wait";
-                ButtonCancel.Enabled = false;
-            }
         }
 
         private void FormProgress_Shown(object sender, System.EventArgs e)
