@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TaskProgressExample
@@ -29,7 +23,7 @@ namespace TaskProgressExample
             };
             Controls.Add(tableLayout);
 
-            tableLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 80));
+            tableLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 70));
             var buttonExample1 = new Button
             {
                 Dock = DockStyle.Fill,
@@ -40,7 +34,7 @@ namespace TaskProgressExample
             buttonExample1.Click += ButtonExample1_Click;
             tableLayout.Controls.Add(buttonExample1);
 
-            tableLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 80));
+            tableLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 70));
             var buttonExample2 = new Button
             {
                 Dock = DockStyle.Fill,
@@ -51,7 +45,7 @@ namespace TaskProgressExample
             buttonExample2.Click += ButtonExample2_Click;
             tableLayout.Controls.Add(buttonExample2);
 
-            tableLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 80));
+            tableLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 70));
             var buttonExample3 = new Button
             {
                 Dock = DockStyle.Fill,
@@ -69,7 +63,7 @@ namespace TaskProgressExample
         {
             int n = 50;
             long result;
-            using (var formProgress = new FormProgress(this, "Example 1", "No progress report, please wait for 5 seconds.", 0, false))
+            using (var formProgress = new FormProgress("Example 1", "No progress report, please wait for 5 seconds.", 0, false))
             {
                 formProgress.Show();
                 result = await formProgress.RunTask(() => Fibonacci(n, null, null));
@@ -81,7 +75,7 @@ namespace TaskProgressExample
         {
             int n = 50;
             long result;
-            using (var formProgress = new FormProgress(this, "Example 2", "", n, false))
+            using (var formProgress = new FormProgress("Example 2", "", n, false))
             {
                 formProgress.Show();
                 result = await formProgress.RunTask(() => Fibonacci(n, formProgress.Progress, null));
@@ -93,7 +87,7 @@ namespace TaskProgressExample
         {
             int n = 50;
             long result;
-            using (var formProgress = new FormProgress(this, "Example 3", "", n, true))
+            using (var formProgress = new FormProgress("Example 3", "", n, true))
             {
                 formProgress.Show();
                 result = await formProgress.RunTask(() => Fibonacci(n, formProgress.Progress, formProgress.CancellationTokenSource));

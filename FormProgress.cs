@@ -11,27 +11,20 @@ namespace TaskProgressExample
         private Label LabelInfo1;
         private Label LabelInfo2;
         private ProgressBar ProgressBar;
-        private Form parentForm;
-
-        private int maxProgress;
 
         public Progress<string> Progress;
         public CancellationTokenSource CancellationTokenSource;
 
-        public FormProgress(Form parentForm, string info1, string info2, int maxProgress, bool isCancellable)
+        public FormProgress(string info1, string info2, int progressMax, bool isCancellable)
         {
             InitializeComponent();
 
             this.Size = new Size(500, 160);
+            this.StartPosition = FormStartPosition.CenterScreen;
             this.ShowInTaskbar = false;
             this.Text = "";
             this.ControlBox = false;
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
-
-            this.Shown += FormProgress_Shown;
-
-            this.parentForm = parentForm;
-            this.maxProgress = maxProgress;
 
             CancellationTokenSource = new CancellationTokenSource();
 
@@ -64,8 +57,8 @@ namespace TaskProgressExample
             ProgressBar = new ProgressBar
             {
                 Dock = DockStyle.Fill,
-                Maximum = maxProgress > 0 ? maxProgress : 100,
-                Style = maxProgress > 0 ? ProgressBarStyle.Blocks : ProgressBarStyle.Marquee,
+                Maximum = progressMax > 0 ? progressMax : 100,
+                Style = progressMax > 0 ? ProgressBarStyle.Blocks : ProgressBarStyle.Marquee,
             };
             tableLayout.Controls.Add(ProgressBar);
 
@@ -78,27 +71,17 @@ namespace TaskProgressExample
             };
             ButtonCancel.Click += (s, e) => { CancellationTokenSource.Cancel(); };
             tableLayout.Controls.Add(ButtonCancel);
-        }
 
-        private void FormProgress_Shown(object sender, System.EventArgs e)
-        {
-            this.Left = parentForm.Left + parentForm.Width / 2 - this.Width / 2;
-            this.Top = parentForm.Top + parentForm.Height / 2 - this.Height / 2;
+            Progress = new Progress<string>(info =>
+            {
+                var segs = info.Split('|');
+                ProgressBar.Value = int.Parse(segs[0]);
+                LabelInfo2.Text = segs[0] + ": " + segs[1];
+            });
         }
 
         public async Task<long> RunTask(Func<long> action)
         {
-            if (maxProgress > 0)
-            {
-                Progress = new Progress<string>(info =>
-                {
-                    var segs = info.Split('|');
-                    ProgressBar.Value = int.Parse(segs[0]);
-                    if (segs.Length > 1)
-                        LabelInfo2.Text = segs[0] + ": " + segs[1];
-                });
-            }
-
             var result = await Task<long>.Run(action);
 
             this.Close();
